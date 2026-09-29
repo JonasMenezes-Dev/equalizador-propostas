@@ -24,7 +24,7 @@ jobs:
         run: python -m pip install --upgrade pip
 
       - name: Instalar dependências
-        run: pip install -e .
+        run: pip install -e ".[dev]"
 
       - name: Rodar pytest
         run: pytest
