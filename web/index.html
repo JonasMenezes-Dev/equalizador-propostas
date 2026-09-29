@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Equalizador de Propostas</title>
+    <link rel="stylesheet" href="/styles.css?v=20260918-1" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">GEP / compras</p>
+          <h1>Equalizador de propostas</h1>
+          <p class="subtitle">Normalize, compare e escolha com evidências.</p>
+        </div>
+        <div class="topbar-actions">
+          <button id="theme-toggle" class="icon-button theme-toggle" type="button" aria-label="Ativar tema escuro" title="Ativar tema escuro">☾</button>
+          <span class="status"><i></i> <span id="build-status">Motor operacional</span></span>
+        </div>
+      </header>
+
+      <section class="workspace">
+        <form id="upload-form" class="upload-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Nova análise</p>
+              <h2>Importe uma planilha de propostas</h2>
+            </div>
+            <span class="file-type">XLSX / XLSM</span>
+          </div>
+          <label class="dropzone" for="file-input" id="dropzone">
+            <span class="upload-icon">↑</span>
+            <strong id="file-label">Escolha ou arraste sua planilha aqui</strong>
+            <small>Uma linha por item e fornecedor</small>
+            <input id="file-input" type="file" accept=".xlsx,.xlsm,.xltx,.xltm" required aria-describedby="error-message" />
+          </label>
+          <div class="form-row">
+            <label for="sheet-input">Aba <span>(opcional)</span></label>
+            <input id="sheet-input" type="text" placeholder="Detecção automática" />
+            <button type="submit" id="process-button">Processar proposta <span>↗</span></button>
+          </div>
+          <p id="error-message" class="message error" hidden></p>
+          <div id="error-diagnostic" class="diagnostic" hidden role="alert" aria-live="assertive">
+            <div class="diagnostic-head">
+              <span class="diagnostic-icon" aria-hidden="true">!</span>
+              <div>
+                <strong id="diagnostic-title">Não foi possível ler a planilha</strong>
+                <p id="diagnostic-message"></p>
+              </div>
+            </div>
+            <div id="diagnostic-missing" class="diagnostic-block" hidden>
+              <span class="diagnostic-label">Não reconhecido</span>
+              <ul id="diagnostic-missing-list" class="diagnostic-chips"></ul>
+            </div>
+            <div id="diagnostic-found" class="diagnostic-block" hidden>
+              <span class="diagnostic-label">Reconhecido na planilha</span>
+              <ul id="diagnostic-found-list" class="diagnostic-chips found"></ul>
+            </div>
+            <div id="diagnostic-tips" class="diagnostic-block" hidden>
+              <span class="diagnostic-label">Como corrigir</span>
+              <ul id="diagnostic-tips-list" class="diagnostic-tips"></ul>
+            </div>
+          </div>
+          <div id="loading-message" class="loading-state" hidden>
+            <div class="loading-line"><strong id="progress-label">Preparando arquivo...</strong><span id="progress-value">0%</span></div>
+            <div class="progress-track"><div id="progress-bar" class="progress-bar"></div></div>
+            <small id="progress-detail">A análise será executada no servidor.</small>
+          </div>
+        </form>
+
+        <section id="results" hidden>
+          <div class="result-head">
+            <div>
+              <p class="eyebrow">Análise concluída</p>
+              <h2 id="result-title">Resumo da cotação</h2>
+            </div>
+            <a id="download-link" class="download" href="#" hidden disabled aria-disabled="true">↓ Baixar relatório Excel</a>
+          </div>
+          <div id="metrics" class="metrics"></div>
+          <div id="notices" class="notices"></div>
+          <section id="charts-panel" class="charts-panel" hidden>
+            <div class="section-title charts-title">
+              <div class="section-heading"><h3>Leituras visuais</h3><span>valores em R$ e percentuais</span></div>
+            </div>
+            <div class="charts-grid" id="charts-grid"></div>
+            <template id="chart-card-template">
+              <article class="chart-card">
+                <div class="chart-heading"><div><h4 class="chart-title"></h4><p class="chart-desc"></p></div><span class="chart-key"></span></div>
+                <div class="chart" role="img"><span class="chart-fallback"></span></div>
+              </article>
+            </template>
+          </section>
+          <section id="source-analysis" class="data-panel source-analysis" hidden>
+            <div class="section-title"><div class="section-heading"><h3>Análise aprofundada da fonte</h3><span id="source-type"></span></div></div>
+            <div id="source-metrics" class="source-metrics"></div>
+            <div class="table-wrap"><table><thead id="source-products-head"></thead><tbody id="source-products-body"></tbody></table></div>
+          </section>
+          <section id="descartes-panel" class="data-panel descartes-panel" hidden>
+            <div class="section-title">
+              <div class="section-heading"><h3>Linhas não aproveitadas</h3><span id="descartes-count"></span></div>
+            </div>
+            <div class="table-wrap"><table><thead id="descartes-head"></thead><tbody id="descartes-body"></tbody></table></div>
+          </section>
+          <section id="alerts-panel" class="data-panel alerts-panel" hidden>
+            <div class="section-title">
+              <div class="section-heading"><h3>Pontos de atenção</h3><span id="alert-count"></span></div>
+              <button id="alerts-toggle" class="icon-button" type="button" aria-expanded="false" aria-controls="alerts-list" title="Mostrar pontos de atenção">&#128065;</button>
+            </div>
+            <div id="alerts-list" class="alerts-list" hidden aria-hidden="true"></div>
+          </section>
+          <div class="content-grid">
+            <section class="data-panel recommendations">
+              <div class="section-title"><h3>Recomendações</h3><span id="recommendation-count"></span></div>
+              <div class="table-wrap"><table><thead id="recommendations-head"></thead><tbody id="recommendations-body"></tbody></table></div>
+            </section>
+            <section class="data-panel insights">
+              <div class="section-title"><h3>Leitura executiva</h3></div>
+              <ul id="insights-list"></ul>
+              <div id="executive-grid" class="executive-grid"></div>
+            </section>
+          </div>
+        </section>
+      </section>
+    </main>
+    <script src="/app.js?v=20260918-1"></script>
+  </body>
+</html>

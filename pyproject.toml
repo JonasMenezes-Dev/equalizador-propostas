@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "equalizador-proposta-gep"
+version = "1.0.0"
+description = "Motor de equalização e comparação de propostas para compras."
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.26",
+    "pandas>=2.1",
+    "openpyxl>=3.1",
+    "rapidfuzz>=3.6",
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+    "python-multipart>=0.0.9",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.pyright]
+include = ["src", "tests", "main.py"]
+extraPaths = ["src"]
+typeCheckingMode = "basic"
+
+[tool.setuptools.packages.find]
+where = ["src"]
